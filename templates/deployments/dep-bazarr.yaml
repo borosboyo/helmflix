@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bazarr
+  labels:
+    app: bazarr
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bazarr
+  template:
+    metadata:
+      labels:
+        app: bazarr
+    spec:
+      hostNetwork: true
+      containers:
+        - name: bazarr
+          image: {{ .Values.bazarr.image }}
+          ports:
+            - containerPort: {{ .Values.bazarr.port }}
+          volumeMounts:
+            - name: shared-storage
+              mountPath: {{ .Values.bazarr.volumes.config }}
+              subPath: bazarr/config
+            - name: shared-storage
+              mountPath: {{ .Values.bazarr.volumes.movies }}
+              subPath: bazarr/movies
+            - name: shared-storage
+              mountPath: {{ .Values.bazarr.volumes.tv }}
+              subPath: bazarr/tv
+      volumes:
+        - name: shared-storage
+          persistentVolumeClaim:
+            claimName: {{ .Values.volume.name }}

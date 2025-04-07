@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: radarr
+  labels:
+    app: radarr
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: radarr
+  template:
+    metadata:
+      labels:
+        app: radarr
+    spec:
+      hostNetwork: true
+      containers:
+        - name: radarr
+          image: {{ .Values.radarr.image }}
+          ports:
+            - containerPort: {{ .Values.radarr.port }}
+          volumeMounts:
+            - name: shared-storage
+              mountPath: {{ .Values.radarr.volumes.config }}
+              subPath: radarr/config
+            - name: shared-storage
+              mountPath: {{ .Values.radarr.volumes.movies }}
+              subPath: radarr/movies
+            - name: shared-storage
+              mountPath: {{ .Values.radarr.volumes.downloads }}
+              subPath: radarr/downloads
+      volumes:
+        - name: shared-storage
+          persistentVolumeClaim:
+            claimName: {{ .Values.volume.name }}

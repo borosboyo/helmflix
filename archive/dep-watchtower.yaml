@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: watchtower
+  labels:
+    app: watchtower
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: watchtower
+  template:
+    metadata:
+      labels:
+        app: watchtower
+    spec:
+      containers:
+        - name: watchtower
+          image: {{ .Values.watchtower.image }}
+          args:
+            - --schedule
+            - {{ .Values.watchtower.schedule }}
+          volumeMounts:
+            - name: docker-socket
+              mountPath: /var/run/docker.sock
+            - name: localtime
+              mountPath: /etc/localtime
+              readOnly: true
+          command: ["--cleanup", "--schedule", "0 0 3 * * 1", "--stop-timeout", "30s", "--rolling-restart"]
+      volumes:
+        - name: docker-socket
+          hostPath:
+            path: /var/run/docker.sock
+            type: Socket
+        - name: localtime
+          hostPath:
+            path: /etc/localtime
+            type: File

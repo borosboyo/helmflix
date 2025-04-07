@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sonarr
+  labels:
+    app: sonarr
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sonarr
+  template:
+    metadata:
+      labels:
+        app: sonarr
+    spec:
+      hostNetwork: true
+      containers:
+        - name: sonarr
+          image: {{ .Values.sonarr.image }}
+          ports:
+            - containerPort: {{ .Values.sonarr.port }}
+          volumeMounts:
+            - name: shared-storage
+              mountPath: {{ .Values.sonarr.volumes.config }}
+              subPath: sonarr/config
+            - name: shared-storage
+              mountPath: {{ .Values.sonarr.volumes.tv }}
+              subPath: sonarr/tv
+            - name: shared-storage
+              mountPath: {{ .Values.sonarr.volumes.downloads }}
+              subPath: sonarr/downloads
+      volumes:
+        - name: shared-storage
+          persistentVolumeClaim:
+            claimName: {{ .Values.volume.name }}

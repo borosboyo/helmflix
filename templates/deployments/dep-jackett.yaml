@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jackett
+  labels:
+    app: jackett
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jackett
+  template:
+    metadata:
+      labels:
+        app: jackett
+    spec:
+      hostNetwork: true
+      containers:
+        - name: jackett
+          image: {{ .Values.jackett.image }}
+          ports:
+            - containerPort: {{ .Values.jackett.port }}
+          volumeMounts:
+            - name: shared-storage
+              mountPath: {{ .Values.jackett.volumes.config }}
+              subPath: jackett/config
+            - name: shared-storage
+              mountPath: {{ .Values.jackett.volumes.downloads }}
+              subPath: jackett/downloads
+      volumes:
+        - name: shared-storage
+          persistentVolumeClaim:
+            claimName: {{ .Values.volume.name }}

@@ -1,0 +1,89 @@
+apiVersion: v2
+name: helmflix
+version: 0.1.0
+description: A Helm chart for self-hosted media stack
+
+tld: borosboyo.com
+
+svc:
+  enabled: true
+
+volume:
+  name: helmflix
+  mountPath: /helmflix
+
+watchtower:
+  enabled: true
+  image: containrrr/watchtower
+  schedule: "0 0 3 * * 1"
+  stopTimeout: 30s
+
+jackett:
+  enabled: true
+  image: lscr.io/linuxserver/jackett:latest
+  port: 9117
+  volumes:
+    config: /helmflix/config
+    downloads: /helmflix/downloads
+
+transmission:
+  enabled: true
+  image: lscr.io/linuxserver/transmission:latest
+  ports:
+    web: 9091
+    peer: 51413
+  volumes:
+    config: /helmflix/config
+    downloads: /helmflix/downloads
+
+radarr:
+  enabled: true
+  image: lscr.io/linuxserver/radarr:latest
+  port: 7878
+  volumes:
+    config: /helmflix/config
+    movies: /helmflix/movies
+    downloads: /helmflix/downloads
+
+sonarr:
+  enabled: true
+  image: lscr.io/linuxserver/sonarr:latest
+  port: 8989
+  volumes:
+    config: /helmflix/config
+    tv: /helmflix/tv
+    downloads: /helmflix/downloads
+
+maintainerr:
+  enabled: true
+  image: ghcr.io/jorenn92/maintainerr:latest
+  port: 6246
+  volumes:
+    data: /helmflix/data
+
+overseerr:
+  enabled: true
+  image: sctx/overseerr:latest
+  port: 5055
+  volumes:
+    config: /helmflix/config
+
+plex:
+  enabled: true
+  image: plexinc/pms-docker
+  port: 32400
+  volumes:
+    config: /helmflix/config
+    transcode: /helmflix/transcode
+    data: /helmflix/data
+  env:
+    PLEX_CLAIM: "<PLEX_CLAIM>"
+
+bazarr:
+  enabled: true
+  image: lscr.io/linuxserver/bazarr:latest
+  port: 6767
+  volumes:
+    config: /helmflix/config
+    movies: /helmflix/movies
+    tv: /helmflix/tv

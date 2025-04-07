@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: plex
+  labels:
+    app: plex
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: plex
+  template:
+    metadata:
+      labels:
+        app: plex
+    spec:
+      hostNetwork: true
+      containers:
+        - name: plex
+          image: {{ .Values.plex.image }}
+          volumeMounts:
+            - name: shared-storage
+              mountPath: {{ .Values.plex.volumes.config }}
+              subPath: plex/config
+            - name: shared-storage
+              mountPath: {{ .Values.plex.volumes.transcode }}
+              subPath: plex/transcode
+            - name: shared-storage
+              mountPath: {{ .Values.plex.volumes.data }}
+              subPath: plex/data
+          env:
+            - name: PLEX_CLAIM
+              value: {{ .Values.plex.env.PLEX_CLAIM }}
+      volumes:
+        - name: shared-storage
+          persistentVolumeClaim:
+            claimName: {{ .Values.volume.name }}

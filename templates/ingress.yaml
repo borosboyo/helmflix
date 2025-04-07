@@ -1,0 +1,95 @@
+{{- $fullName := include "helmflix.fullname" . -}}
+{{- $tld := .Values.tld -}}
+{{- if semverCompare ">=1.14-0" .Capabilities.KubeVersion.GitVersion -}}
+apiVersion: networking.k8s.io/v1
+{{- else -}}
+apiVersion: extensions/v1beta1
+{{- end }}
+kind: Ingress
+metadata:
+  name: {{ $fullName }}
+  labels:
+    {{- include "helmflix.labels" . | nindent 4 }}
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: jackett.{{ $tld }}
+      http:
+        paths:
+          - backend:
+              service:
+                name: jackett
+                port:
+                  number: 9117
+            path: /
+            pathType: ImplementationSpecific
+    - host: transmission.{{ $tld }}
+      http:
+        paths:
+          - backend:
+              service:
+                name: transmission
+                port:
+                  number: 9091
+            path: /
+            pathType: ImplementationSpecific
+    - host: radarr.{{ $tld }}
+      http:
+        paths:
+          - backend:
+              service:
+                name: radarr
+                port:
+                  number: 7878
+            path: /
+            pathType: ImplementationSpecific
+    - host: sonarr.{{ $tld }}
+      http:
+        paths:
+          - backend:
+              service:
+                name: sonarr
+                port:
+                  number: 8989
+            path: /
+            pathType: ImplementationSpecific
+    - host: maintainerr.{{ $tld }}
+      http:
+        paths:
+          - backend:
+              service:
+                name: maintainerr
+                port:
+                  number: 6246
+            path: /
+            pathType: ImplementationSpecific
+    - host: overseerr.{{ $tld }}
+      http:
+        paths:
+          - backend:
+              service:
+                name: overseerr
+                port:
+                  number: 5055
+            path: /
+            pathType: ImplementationSpecific
+    - host: plex.{{ $tld }}
+      http:
+        paths:
+          - backend:
+              service:
+                name: plex
+                port:
+                  number: 32400
+            path: /
+            pathType: ImplementationSpecific
+    - host: bazarr.{{ $tld }}
+      http:
+        paths:
+          - backend:
+              service:
+                name: bazarr
+                port:
+                  number: 6767
+            path: /
+            pathType: ImplementationSpecific

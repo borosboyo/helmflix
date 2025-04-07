@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: overseerr
+  labels:
+    app: overseerr
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: overseerr
+  template:
+    metadata:
+      labels:
+        app: overseerr
+    spec:
+      hostNetwork: true
+      containers:
+        - name: overseerr
+          image: {{ .Values.overseerr.image }}
+          ports:
+            - containerPort: {{ .Values.overseerr.port }}
+          volumeMounts:
+            - name: shared-storage
+              mountPath: {{ .Values.overseerr.volumes.config }}
+              subPath: overseerr/config
+      volumes:
+        - name: shared-storage
+          persistentVolumeClaim:
+            claimName: {{ .Values.volume.name }}

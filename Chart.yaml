@@ -1,0 +1,9 @@
+apiVersion: v2
+name: helmflix
+icon: https://avatars.githubusercontent.com/u/56091462?v=4
+description: A Helm chart for a home media environment
+
+type: application
+version: 0.1.0
+
+appVersion: 1.0.0

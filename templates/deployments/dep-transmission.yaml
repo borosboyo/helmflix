@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: transmission
+  labels:
+    app: transmission
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: transmission
+  template:
+    metadata:
+      labels:
+        app: transmission
+    spec:
+      hostNetwork: true
+      containers:
+        - name: transmission
+          image: {{ .Values.transmission.image }}
+          ports:
+            - containerPort: {{ .Values.transmission.ports.web }}
+            - containerPort: {{ .Values.transmission.ports.peer }}
+          volumeMounts:
+            - name: shared-storage
+              mountPath: {{ .Values.transmission.volumes.config }}
+              subPath: transmission/config
+            - name: shared-storage
+              mountPath: {{ .Values.transmission.volumes.downloads }}
+              subPath: transmission/downloads
+      volumes:
+        - name: shared-storage
+          persistentVolumeClaim:
+            claimName: {{ .Values.volume.name }}

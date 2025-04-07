@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: maintainerr
+  labels:
+    app: maintainerr
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: maintainerr
+  template:
+    metadata:
+      labels:
+        app: maintainerr
+    spec:
+      hostNetwork: true
+      containers:
+        - name: maintainerr
+          image: {{ .Values.maintainerr.image }}
+          ports:
+            - containerPort: {{ .Values.maintainerr.port }}
+          volumeMounts:
+            - name:  shared-storage
+              mountPath: {{ .Values.maintainerr.volumes.data }}
+              subPath: maintainerr/data
+      volumes:
+        - name: shared-storage
+          persistentVolumeClaim:
+            claimName: {{ .Values.volume.name }}
